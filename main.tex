@@ -1,0 +1,23 @@
+\documentclass[a4paper,11pt]{report}
+\usepackage{./styles/dlite3_group_report} % .styファイルを読み込む
+\usepackage{csquotes}
+
+\input{bibresource.tex}
+
+\fancyhead{} % 既存のヘッダーをクリア
+\fancyfoot{} % 既存のフッターをクリア
+\fancyfoot[C]{\thepage} % フッター中央にページ番号を表示
+
+\begin{document}
+\pagenumbering{gobble}
+\input{pages/title/title}
+\newpage
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+\pagenumbering{arabic}
+\input{pages/abstract/abstract}
+\newpage
+\input{pages/report/report}
+\end{document}

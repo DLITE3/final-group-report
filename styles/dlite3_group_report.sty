@@ -1,0 +1,160 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{dlite3_group_report}
+   [2024/12/23 DLITE3 final report tex style]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 必要なパッケージ
+\RequirePackage{verbatim}       % verbatim環境
+\RequirePackage{graphicx}       % 画像挿入
+\RequirePackage{titlesec}       % セクションタイトルのカスタマイズ
+\RequirePackage{tocloft}        % 目次のカスタマイズ
+\RequirePackage{amsmath}        % 数式
+\RequirePackage{indentfirst}    % インデント
+\RequirePackage{etoolbox}       % Additional tools for LaTeX
+\RequirePackage{url}            % URL表示
+\RequirePackage{hyperref}       % ハイパーリンク
+\RequirePackage{fancyhdr}       % ヘッダーとフッター
+\RequirePackage{titlesec}       % セクションタイトルのカスタマイズ
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% グローバルな初期化
+\newif\if@mid@
+\DeclareOption{middle}{\@mid@true}
+\DeclareOption{final}{\@mid@false}
+\ProcessOptions\relax
+
+% 条件付きコマンド
+\def\mid@fin#1#2{\if@mid@ #1\else#2\fi}
+\let\midorfin\mid@fin
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% フォントとレイアウト
+\newdimen\fullwidth
+\headheight=2\topskip
+\headsep=1pt
+\topmargin=-\headheight
+\advance\topmargin by -\headsep
+\advance\topmargin by -2pt
+
+% フォントサイズ設定
+\@setfontsize\normalsize{10pt}{15pt}
+\parindent=1em
+
+% ページ設定
+\setlength\textwidth{44em}
+\setlength\fullwidth{\textwidth}
+\setlength\textheight{45\baselineskip}
+\evensidemargin=0pt
+\oddsidemargin=0pt
+
+% その他の設定
+\setlength\footskip{20pt}
+
+% 必要なパッケージをロード
+\RequirePackage{fontspec} % フォント設定
+\RequirePackage{polyglossia} % 多言語対応
+
+% 言語設定
+\setdefaultlanguage{japanese}
+\setotherlanguage{english}
+
+% 日本語フォント設定
+\setmainfont{Noto Serif CJK JP} % 日本語用メインフォント
+\setsansfont{Noto Sans CJK JP}  % 日本語用サンセリフフォント
+\newfontfamily\englishfont{Liberation Serif} % 英語用フォント
+
+% 日本語対応モノスペースフォントの設定
+\newfontfamily\cjkfonttt{Noto Sans CJK JP}[Contextuals={WordInitial,WordFinal}]
+
+% biblatexの設定
+\RequirePackage[backend=biber,style=numeric,defernumbers=true]{biblatex}
+
+% 日本語と英語の切り替えコマンド
+\newcommand{\ja}[1]{{\selectlanguage{japanese}#1}}
+\newcommand{\en}[1]{{\selectlanguage{english}#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% マクロと環境
+\newcommand{\AgendaBox}[2]{%
+    \large
+    \textbf{#1}\\
+
+    \vspace{0.2cm}
+
+    \small 
+    #2
+
+    \vspace{0.5cm}
+}
+
+\newcommand{\NameBox}[2]{%
+    \small 
+    #1\hspace{1cm}#2
+}
+
+% 目次の設定
+\usepackage{tocloft}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftchappresnum}{第 }
+\renewcommand{\cftchapaftersnum}{ 章}
+\renewcommand{\cftchapnumwidth}{4em}
+\renewcommand{\cftchapfont}{\bfseries}
+\renewcommand{\cftchappagefont}{\bfseries}
+
+
+% Chapter title formatting
+\titleformat{\chapter}[hang]
+    {\bfseries\huge} % Title style
+    {第 \thechapter 章} % Label
+    {1em} % Spacing between label and title
+    {\huge} % Title font
+\titlespacing*{\chapter}{0pt}{15pt}{15pt} % Adjust spacing: {left}{before}{after}
+
+% Section title formatting
+\titleformat{\section}{\LARGE\bfseries}{\arabic{chapter}.\arabic{section}}{1em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{1em}{}
+\renewcommand{\thesubsection}{\normalsize\arabic{chapter}.\arabic{section}.\arabic{subsection}}
+
+\newcommand{\Writer}[1]{%
+    \vspace{1em}\par\begingroup\raggedleft（※文責：#1）\par\endgroup
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 日本語専用コマンド
+\newcommand{\qu}[1]{`#1'}
+\newcommand{\yy}[1]{『#1』}
+\newcommand{\chapref}[1]{第~\ref{chap:#1}~章}
+\newcommand{\secref}[1]{\ref{sec:#1}~節}
+
+\newenvironment{jabstract}{%
+   \centerline{\Large\bfseries 概要}\par%
+   \begin{list}{}{% プロパティの調整
+      \leftmargin=3zw
+      \rightmargin\leftmargin
+      \listparindent0pt}\item[]\relax
+      \small}% 
+   {\end{list}\par\clearpage}
+
+\newenvironment{ekeyword}{%
+   \vspace{1em}\noindent{\bfseries\small Keywords:}\small}{\par}
+
+\newenvironment{jkeyword}{%
+   \vspace{1em}\noindent{\bfseries\small キーワード:}\small}{\par}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ヘッダーとフッターの設定
+\pagestyle{plain}
+
+% Custom macros
+\newcommand{\myimage}[4][width=.8\textwidth]{%
+  \begin{figure}[htbp]%
+    \centering\includegraphics[#1]{#2}% 
+    \caption{#3}\label{fig:#4}%
+  \end{figure}}%
+
+\newenvironment{mytab}[3][htbp]{%
+  \begin{table}[#1]\begin{center}\caption{#2}\label{tab:#3}}%
+  {\end{center}\end{table}}%
+
+\endinput
+%%
+%% End of file `dlite3_group_report.sty'
