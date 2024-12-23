@@ -107,14 +107,14 @@
     {第 \thechapter 章} % Label
     {1em} % Spacing between label and title
     {\huge} % Title font
-\titlespacing*{\chapter}{0pt}{15pt}{15pt} % Adjust spacing: {left}{before}{after}
+\titlespacing*{\chapter}{0pt}{-10pt}{15pt} % Adjust spacing: {left}{before}{after}
 
 % Section title formatting
 \titleformat{\section}{\LARGE\bfseries}{\arabic{chapter}.\arabic{section}}{1em}{}
 \titleformat{\subsection}{\large\bfseries}{\thesubsection}{1em}{}
 \renewcommand{\thesubsection}{\normalsize\arabic{chapter}.\arabic{section}.\arabic{subsection}}
 
-\newcommand{\Writer}[1]{%
+\newcommand{\writer}[1]{%
     \vspace{1em}\par\begingroup\raggedleft（※文責：#1）\par\endgroup
 }
 
