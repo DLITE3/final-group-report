@@ -15,6 +15,8 @@ pages
 |- title
   |- title.tex
 |- report
+  |- images
+    |- sample.jpg
   |- report.tex
   |- report.bib
 main.tex
