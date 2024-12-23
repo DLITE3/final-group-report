@@ -9,14 +9,14 @@
 ### ディレクトリ構成
 ※ 一部省略
 ```
-images
-|- sample.jpg
 pages
 |- abstract
   |- abstract.tex
 |- title
   |- title.tex
 |- report
+  |- images
+    |- sample.jpg
   |- report.tex
   |- report.bib
 main.tex
