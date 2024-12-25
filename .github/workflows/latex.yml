@@ -36,24 +36,26 @@ jobs:
     - name: Install Google Drive API library
       run: pip install google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
 
-    - name: Upload to Google Drive
+    - name: Upload to Google Drive and Send to Discord
       env:
         GOOGLE_APPLICATION_CREDENTIALS: "${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}"
+        DISCORD_WEBHOOK_URL: "${{ secrets.DISCORD_WEBHOOK_URL }}"
         BRANCH_NAME: "${{ github.ref }}"  # ブランチ名を取得
       run: |
         # ブランチ名の抽出（refs/heads/ を取り除く）
         branch_name=$(echo $BRANCH_NAME | sed 's/refs\/heads\///')
-        
+
         # BRANCH_NAMEを環境変数として渡す
         export BRANCH_NAME=$branch_name
 
-        # PythonスクリプトでGoogle Driveにアップロード
+        # PythonスクリプトでGoogle DriveにアップロードとDiscordへの送信
         python <<EOF
         import os
         import json
         from google.oauth2 import service_account
         from googleapiclient.discovery import build
         from googleapiclient.http import MediaFileUpload
+        import requests
 
         # シークレットから認証情報をJSON形式で取得
         credentials_info = json.loads(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
@@ -81,7 +83,22 @@ jobs:
 
         # PDFファイルのアップロード
         media = MediaFileUpload('build/main.pdf', mimetype='application/pdf')
-        file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+        file = drive_service.files().create(body=file_metadata, media_body=media, fields='id, webViewLink').execute()
 
-        print(f"Uploaded file with ID: {file.get('id')}")
+        # Google Driveのファイルリンクを取得
+        file_link = file.get('webViewLink')
+
+        # Discordへのメッセージ送信
+        discord_webhook_url = os.environ['DISCORD_WEBHOOK_URL']
+        message = {
+            "content": f"新しいPDFファイルがアップロードされました: {file_link}"
+        }
+
+        # Discordにメッセージを送信
+        response = requests.post(discord_webhook_url, json=message)
+
+        if response.status_code == 204:
+            print("Successfully sent message to Discord.")
+        else:
+            print(f"Failed to send message to Discord. Status code: {response.status_code}")
         EOF
