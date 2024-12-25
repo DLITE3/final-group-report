@@ -1,0 +1,30 @@
+name: Build LaTeX Document
+
+on:
+  push:  # 全てのブランチで実行
+  pull_request:  # プルリクエスト時にも実行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up LaTeX environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y texlive-full lualatex latexmk
+
+    - name: Build LaTeX document with lualatex
+      run: |
+        ./build.sh  # ビルドスクリプトの実行
+      env:
+        HOME: /github/home  # ホームディレクトリエラーを防ぐための設定
+
+    - name: Upload PDF artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: compiled-pdf
+        path: build/main.pdf  # ビルドされたPDFの場所
