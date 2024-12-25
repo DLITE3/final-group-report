@@ -6,20 +6,21 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Ubuntu 22.04 LTS
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up LaTeX environment
+    - name: Install required LaTeX packages
       run: |
         sudo apt-get update
-        sudo apt-get install -y texlive-full lualatex latexmk
+        sudo apt-get install -y \
+          texlive-luatex latexmk texlive-fonts-recommended texlive-latex-recommended texlive-latex-extra texlive-xetex
 
     - name: Build LaTeX document with lualatex
       run: |
-        ./build.sh  # ビルドスクリプトの実行
+        ./build.sh # ビルドスクリプトの実行
       env:
         HOME: /github/home  # ホームディレクトリエラーを防ぐための設定
 
