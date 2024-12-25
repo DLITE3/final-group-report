@@ -42,26 +42,34 @@ jobs:
       run: |
         python <<EOF
         import os
+        import json
         from google.oauth2 import service_account
         from googleapiclient.discovery import build
         from googleapiclient.http import MediaFileUpload
-
-        # Authenticate with Google Drive API
+        
+        # シークレットから認証情報をJSON形式で取得
+        credentials_info = json.loads(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
+        
+        # Google Drive API認証
         creds = service_account.Credentials.from_service_account_info(
-            os.environ['GOOGLE_APPLICATION_CREDENTIALS'],
+            credentials_info,
             scopes=['https://www.googleapis.com/auth/drive.file']
         )
+        
         drive_service = build('drive', 'v3', credentials=creds)
-
-        # Define the folder ID (replace 'your-folder-id' with your actual folder ID)
+        
+        # アップロードするGoogle DriveのフォルダID
         folder_id = "your-folder-id"
-
-        # Upload the PDF
+        
+        # PDFファイルのメタデータ設定
         file_metadata = {
-            'name': 'main.pdf',  # File name in Google Drive
-            'parents': [folder_id]
+            'name': 'main.pdf',  # Google Drive上でのファイル名
+            'parents': [folder_id]  # 指定したフォルダにアップロード
         }
+        
+        # PDFファイルのアップロード
         media = MediaFileUpload('build/main.pdf', mimetype='application/pdf')
         file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+        
         print(f"Uploaded file with ID: {file.get('id')}")
         EOF
