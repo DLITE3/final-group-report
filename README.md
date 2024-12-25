@@ -1,7 +1,7 @@
 # DLITE3 最終報告書
 
 ## 動作環境
-- Ubuntu22.04 LTSで作成
+- Ubuntu22.04 Desktopで作成
   - その他OSは動作未保障
 - lualatex
 
