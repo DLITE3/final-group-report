@@ -16,7 +16,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          texlive-luatex biber texlive-fonts-recommended texlive-latex-recommended texlive-latex-extra texlive-xetex texlive-lang-cjk mendexk \
+          texlive-full texlive-luatex biber texlive-fonts-recommended texlive-latex-recommended texlive-latex-extra texlive-xetex texlive-lang-cjk mendexk \
           fonts-noto-cjk  # Noto Sans CJK JP フォントのインストール
 
     - name: Make build script executable
