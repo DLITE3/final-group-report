@@ -1,12 +1,12 @@
-name: Build LaTeX Document
+name: Build and Upload to Google Drive
 
 on:
-  push:  # 全てのブランチで実行
-  pull_request:  # プルリクエスト時にも実行
+  push:
+  pull_request:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Ubuntu 22.04 LTS
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
@@ -27,8 +27,40 @@ jobs:
     - name: Debug build folder
       run: ls -al build
 
-    - name: Upload PDF artifact
-      uses: actions/upload-artifact@v3
+    - name: Set up Python environment
+      uses: actions/setup-python@v4
       with:
-        name: compiled-pdf  # Artifacts名
-        path: build/*.pdf  # PDFファイルを指定
+        python-version: '3.x'
+
+    - name: Install Google Drive API library
+      run: pip install google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib
+
+    - name: Upload to Google Drive
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: "${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}"
+      run: |
+        python <<EOF
+        import os
+        from google.oauth2 import service_account
+        from googleapiclient.discovery import build
+        from googleapiclient.http import MediaFileUpload
+
+        # Authenticate with Google Drive API
+        creds = service_account.Credentials.from_service_account_info(
+            os.environ['GOOGLE_APPLICATION_CREDENTIALS'],
+            scopes=['https://www.googleapis.com/auth/drive.file']
+        )
+        drive_service = build('drive', 'v3', credentials=creds)
+
+        # Define the folder ID (replace 'your-folder-id' with your actual folder ID)
+        folder_id = "1sze5HxFJMdntN8H9GUrdXhiQbhFeUA22"
+
+        # Upload the PDF
+        file_metadata = {
+            'name': 'main.pdf',  # File name in Google Drive
+            'parents': [folder_id]
+        }
+        media = MediaFileUpload('build/main.pdf', mimetype='application/pdf')
+        file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+        print(f"Uploaded file with ID: {file.get('id')}")
+        EOF
