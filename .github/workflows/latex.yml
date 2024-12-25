@@ -1,4 +1,4 @@
-name: Build and Upload to Google Drive
+name: Build LaTeX Document and Upload to Google Drive
 
 on:
   push:
@@ -16,7 +16,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          texlive-luatex biber texlive-fonts-recommended texlive-latex-recommended texlive-latex-extra texlive-xetex texlive-lang-cjk mendexk
+          texlive-luatex biber texlive-fonts-recommended texlive-latex-recommended texlive-latex-extra texlive-xetex texlive-lang-cjk mendexk \
+          fonts-noto-cjk  # Noto Sans CJK JP フォントのインストール
 
     - name: Make build script executable
       run: chmod +x build.sh
@@ -53,7 +54,7 @@ jobs:
         drive_service = build('drive', 'v3', credentials=creds)
 
         # Define the folder ID (replace 'your-folder-id' with your actual folder ID)
-        folder_id = "1sze5HxFJMdntN8H9GUrdXhiQbhFeUA22"
+        folder_id = "your-folder-id"
 
         # Upload the PDF
         file_metadata = {
