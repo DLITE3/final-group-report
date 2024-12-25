@@ -16,14 +16,13 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          texlive-luatex latexmk texlive-fonts-recommended texlive-latex-recommended texlive-latex-extra texlive-xetex
+          texlive-luatex biber texlive-fonts-recommended texlive-latex-recommended texlive-latex-extra texlive-xetex texlive-lang-cjk mendexk
 
-    - name: Build LaTeX document with lualatex
-      run: |
-        mkdir -p build
-        latexmk -lualatex -interaction=nonstopmode -output-directory=build main.tex
-      env:
-        HOME: /github/home  # ホームディレクトリエラーを防ぐための設定
+    - name: Make build script executable
+      run: chmod +x build.sh
+
+    - name: Build LaTeX document
+      run: ./build.sh
 
     - name: Upload PDF artifact
       uses: actions/upload-artifact@v3
