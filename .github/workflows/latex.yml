@@ -20,12 +20,13 @@ jobs:
 
     - name: Build LaTeX document with lualatex
       run: |
-        ./build.sh # ビルドスクリプトの実行
+        mkdir -p build
+        latexmk -lualatex -interaction=nonstopmode -output-directory=build main.tex
       env:
         HOME: /github/home  # ホームディレクトリエラーを防ぐための設定
 
     - name: Upload PDF artifact
       uses: actions/upload-artifact@v3
       with:
-        name: compiled-pdf
-        path: build/main.pdf  # ビルドされたPDFの場所
+        name: compiled-pdf  # Artifacts名
+        path: build/*.pdf  # PDFファイルを指定
