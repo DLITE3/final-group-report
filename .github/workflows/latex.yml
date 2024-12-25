@@ -39,6 +39,7 @@ jobs:
     - name: Upload to Google Drive
       env:
         GOOGLE_APPLICATION_CREDENTIALS: "${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}"
+        REPO_NAME: "${{ github.repository }}"  # リポジトリ名を取得
       run: |
         python <<EOF
         import os
@@ -61,9 +62,13 @@ jobs:
         # アップロードするGoogle DriveのフォルダID
         folder_id = "1sze5HxFJMdntN8H9GUrdXhiQbhFeUA22"
 
+        # リポジトリ名を使ってファイル名を決定
+        repo_name = os.environ['REPO_NAME']
+        file_name = f"main-{repo_name}.pdf"  # ファイル名にリポジトリ名を追加
+
         # PDFファイルのメタデータ設定
         file_metadata = {
-            'name': 'main.pdf',  # Google Drive上でのファイル名
+            'name': file_name,  # リポジトリ名を含むファイル名
             'parents': [folder_id]  # 指定したフォルダにアップロード
         }
 
