@@ -6,18 +6,22 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Install required LaTeX packages
+    - name: Install minimal LaTeX packages
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          texlive-full texlive-luatex biber texlive-fonts-recommended texlive-latex-recommended texlive-latex-extra texlive-xetex texlive-lang-cjk mendexk \
-          fonts-noto-cjk  # Noto Sans CJK JP フォントのインストール
+          texlive-base texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+          texlive-lang-cjk fonts-noto-cjk mendexk latexmk \
+          biber  # 必要なツールとパッケージ
+
+    - name: Confirm pdfTeX version
+      run: latex --version  # pdfTeXバージョンの確認
 
     - name: Make build script executable
       run: chmod +x build.sh
@@ -73,7 +77,7 @@ jobs:
 
         # BRANCH_NAME環境変数を使ってファイル名を決定
         branch_name = os.environ['BRANCH_NAME']
-        file_name = f"main-{branch_name}.pdf"  # ファイル名にブランチ名を追加
+        file_name = f"{branch_name}.pdf"  # ファイル名にブランチ名を追加
 
         # PDFファイルのメタデータ設定
         file_metadata = {
