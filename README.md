@@ -6,9 +6,17 @@
 - lualatex
 
 ## 報告書の執筆
+### ブランチを切る
+```sh
+git clone https://github.com/DLITE3/final-group-report.git
+cd final-group-report
+git branch ブランチ名
+git checkout ブランチ名
+```
+
 ### ディレクトリ構成
 ※ 一部省略
-```
+```txt
 pages
 |- abstract
   |- abstract.tex
@@ -40,3 +48,7 @@ report.texに記載。<br />
 chmod +x ./build.sh
 ```
 コマンド実行後main.texと同階層にmain.pdfが生成される
+
+## Auto build & Preview
+GitHubへpushすることでGitHub Actionsの機能で自動でビルドされGoogle Driveへアップロードされる。<br />
+アップロードされた後、共有リンクがDiscordへ送信される。
