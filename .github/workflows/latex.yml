@@ -44,11 +44,13 @@ jobs:
       run: chmod +x build.sh
 
     - name: Build LaTeX document
-      run: ./build.sh
-
+      run: |
+        chmod +x build.sh
+        ./build.sh
+    
     - name: Debug build folder
       run: ls -al build
-
+    
     - name: Output LaTeX log on failure
       if: failure()
       run: cat build/main.log || true

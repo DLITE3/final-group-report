@@ -1,13 +1,19 @@
 #!/bin/bash
-set -e  # エラー時にスクリプトを停止
-set -x  # 実行するコマンドを出力
+set -e
 
+# Create build directory
 mkdir -p build
-lualatex -output-directory=build main.tex || exit 1
-biber build/main || exit 1
-lualatex -output-directory=build main.tex || exit 1
-mendex build/main || exit 1
-lualatex -output-directory=build main.tex || exit 1
 
-# 不要ファイルの削除
-rm -f build/*.aux build/*.bbl build/*.bcf build/*.blg build/*.idx build/*.ilg build/*.ind build/*.lof build/*.log build/*.lot build/*.out build/*.run.xml build/*.toc
+# Compile with lualatex
+lualatex -output-directory=build main.tex
+biber build/main
+lualatex -output-directory=build main.tex
+lualatex -output-directory=build main.tex
+
+# Run mendex if .idx file exists
+if [ -f build/main.idx ]; then
+  mendex build/main
+fi
+
+# Final compile for index integration
+lualatex -output-directory=build main.tex
