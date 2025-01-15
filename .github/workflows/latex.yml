@@ -18,16 +18,23 @@ jobs:
         sudo apt-get install -y \
           texlive-base texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
           texlive-lang-cjk fonts-noto-cjk mendexk latexmk \
-          biber  # 必要なツールとパッケージ
+          biber
 
     - name: Confirm pdfTeX version
-      run: latex --version  # pdfTeXバージョンの確認
+      run: latex --version
 
     - name: Make build script executable
       run: chmod +x build.sh
 
     - name: Build LaTeX document
       run: ./build.sh
+
+    - name: Verify PDF generation
+      run: |
+        if [ ! -f "build/main.pdf" ]; then
+          echo "PDF not found in build directory."
+          exit 1
+        fi
 
     - name: Debug build folder
       run: ls -al build
@@ -44,15 +51,8 @@ jobs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: "${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}"
         DISCORD_WEBHOOK_URL: "${{ secrets.DISCORD_WEBHOOK_URL }}"
-        BRANCH_NAME: "${{ github.ref }}"  # ブランチ名を取得
+        BRANCH_NAME: "${{ github.ref_name }}"
       run: |
-        # ブランチ名の抽出（refs/heads/ を取り除く）
-        branch_name=$(echo $BRANCH_NAME | sed 's/refs\/heads\///')
-
-        # BRANCH_NAMEを環境変数として渡す
-        export BRANCH_NAME=$branch_name
-
-        # PythonスクリプトでGoogle DriveにアップロードとDiscordへの送信
         python <<EOF
         import os
         import json
@@ -77,16 +77,20 @@ jobs:
 
         # BRANCH_NAME環境変数を使ってファイル名を決定
         branch_name = os.environ['BRANCH_NAME']
-        file_name = f"{branch_name}.pdf"  # ファイル名にブランチ名を追加
+        file_name = f"{branch_name}.pdf"
 
         # PDFファイルのメタデータ設定
         file_metadata = {
-            'name': file_name,  # ブランチ名を含むファイル名
-            'parents': [folder_id]  # 指定したフォルダにアップロード
+            'name': file_name,
+            'parents': [folder_id]
         }
 
         # PDFファイルのアップロード
-        media = MediaFileUpload('build/main.pdf', mimetype='application/pdf')
+        pdf_path = 'build/main.pdf'
+        if not os.path.exists(pdf_path):
+            raise FileNotFoundError(f"PDF file not found: {pdf_path}")
+
+        media = MediaFileUpload(pdf_path, mimetype='application/pdf')
         file = drive_service.files().create(body=file_metadata, media_body=media, fields='id, webViewLink').execute()
 
         # Google Driveのファイルリンクを取得
