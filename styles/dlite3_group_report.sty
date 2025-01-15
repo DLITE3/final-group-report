@@ -15,7 +15,15 @@
 \RequirePackage{hyperref}       % ハイパーリンク
 \RequirePackage{fancyhdr}       % ヘッダーとフッター
 \RequirePackage{titlesec}       % セクションタイトルのカスタマイズ
+
+\RequirePackage[top=25mm,bottom=25mm,left=25mm,right=25mm]{geometry}
+
+\RequirePackage{luatexja}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ltjsetparameter{jacharrange=1} % 全角文字の範囲を明示的に設定
+\ltjsetparameter{autospacing=true} % 自動スペース調整を有効化
+\ltjsetparameter{autoxspacing=true} % 自動カーニング調整を有効化
+
 % グローバルな初期化
 \newif\if@mid@
 \DeclareOption{middle}{\@mid@true}

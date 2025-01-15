@@ -35,6 +35,11 @@ jobs:
         luaotfload-tool --cache=erase
         luaotfload-tool --update
 
+    - name: Update TeX Live
+      run: |
+        sudo tlmgr update --self
+        sudo tlmgr update --all
+
     - name: Set environment variables
       run: |
         export LANG=en_US.UTF-8
