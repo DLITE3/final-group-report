@@ -26,6 +26,9 @@ jobs:
     - name: Make build script executable
       run: chmod +x build.sh
 
+    - name: Clean local build folder
+      run: rm -rf build
+
     - name: Build LaTeX document
       run: ./build.sh
 
