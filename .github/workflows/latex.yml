@@ -20,6 +20,11 @@ jobs:
           texlive-fonts-extra texlive-lang-cjk fonts-noto-cjk mendexk latexmk \
           biber
 
+    - name: Check available fonts
+      run: |
+        fc-list | grep "Latin Modern"
+
+
     - name: Confirm pdfTeX version
       run: latex --version
 
