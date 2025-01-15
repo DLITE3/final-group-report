@@ -20,6 +20,10 @@ jobs:
           texlive-fonts-recommended texlive-lang-cjk \
           fonts-lmodern fonts-noto-cjk \
           texlive-luatex latexmk biber mendexk
+        sudo tlmgr init-usertree
+        sudo tlmgr update --self
+        sudo tlmgr install geometry fancyhdr
+
 
     - name: Check for luaotfload-tool
       run: |
