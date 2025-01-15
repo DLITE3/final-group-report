@@ -19,6 +19,7 @@ jobs:
           texlive-base texlive-latex-base texlive-latex-extra \
           texlive-fonts-recommended texlive-lang-cjk \
           fonts-lmodern fonts-noto-cjk \
+          texlive-luatex luaotfload \
           latexmk biber mendexk
 
     - name: Refresh font cache
@@ -59,7 +60,6 @@ jobs:
         DISCORD_WEBHOOK_URL: "${{ secrets.DISCORD_WEBHOOK_URL }}"
         BRANCH_NAME: "${{ github.ref }}"
       run: |
-        # Extract branch name from refs/heads/
         branch_name=$(echo $BRANCH_NAME | sed 's/refs\/heads\///')
 
         export BRANCH_NAME=$branch_name
