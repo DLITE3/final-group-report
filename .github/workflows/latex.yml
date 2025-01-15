@@ -19,8 +19,15 @@ jobs:
           texlive-base texlive-latex-base texlive-latex-extra \
           texlive-fonts-recommended texlive-lang-cjk \
           fonts-lmodern fonts-noto-cjk \
-          texlive-luatex luaotfload \
-          latexmk biber mendexk
+          texlive-luatex latexmk biber mendexk
+
+    - name: Check for luaotfload-tool
+      run: |
+        if ! command -v luaotfload-tool; then
+          echo "luaotfload-tool not found, installing manually."
+          sudo tlmgr init-usertree
+          sudo tlmgr install luaotfload
+        fi
 
     - name: Refresh font cache
       run: |
