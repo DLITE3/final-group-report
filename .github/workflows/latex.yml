@@ -12,18 +12,22 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Install minimal LaTeX packages
+    - name: Install required LaTeX packages
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          texlive-base texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
-          texlive-fonts-extra texlive-lang-cjk fonts-noto-cjk mendexk latexmk \
-          biber
+          texlive-base texlive-latex-base texlive-latex-extra \
+          texlive-fonts-recommended texlive-lang-cjk \
+          fonts-lmodern fonts-noto-cjk \
+          latexmk biber mendexk
 
-    - name: Check available fonts
+    - name: Refresh font cache
       run: |
-        fc-list | grep "Latin Modern"
+        sudo fc-cache -fv
 
+    - name: Clear luaotfload cache
+      run: |
+        luaotfload-tool --cache=erase
 
     - name: Confirm pdfTeX version
       run: latex --version
@@ -31,21 +35,15 @@ jobs:
     - name: Make build script executable
       run: chmod +x build.sh
 
-    - name: Clean local build folder
-      run: rm -rf build
-
     - name: Build LaTeX document
       run: ./build.sh
 
-    - name: Verify PDF generation
-      run: |
-        if [ ! -f "build/main.pdf" ]; then
-          echo "PDF not found in build directory."
-          exit 1
-        fi
-
     - name: Debug build folder
       run: ls -al build
+
+    - name: Output LaTeX log on failure
+      if: failure()
+      run: cat build/main.log || true
 
     - name: Set up Python environment
       uses: actions/setup-python@v4
@@ -59,8 +57,13 @@ jobs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: "${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}"
         DISCORD_WEBHOOK_URL: "${{ secrets.DISCORD_WEBHOOK_URL }}"
-        BRANCH_NAME: "${{ github.ref_name }}"
+        BRANCH_NAME: "${{ github.ref }}"
       run: |
+        # Extract branch name from refs/heads/
+        branch_name=$(echo $BRANCH_NAME | sed 's/refs\/heads\///')
+
+        export BRANCH_NAME=$branch_name
+
         python <<EOF
         import os
         import json
@@ -69,10 +72,7 @@ jobs:
         from googleapiclient.http import MediaFileUpload
         import requests
 
-        # シークレットから認証情報をJSON形式で取得
         credentials_info = json.loads(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
-
-        # Google Drive API認証
         creds = service_account.Credentials.from_service_account_info(
             credentials_info,
             scopes=['https://www.googleapis.com/auth/drive.file']
@@ -80,37 +80,26 @@ jobs:
 
         drive_service = build('drive', 'v3', credentials=creds)
 
-        # アップロードするGoogle DriveのフォルダID
         folder_id = "1sze5HxFJMdntN8H9GUrdXhiQbhFeUA22"
 
-        # BRANCH_NAME環境変数を使ってファイル名を決定
         branch_name = os.environ['BRANCH_NAME']
         file_name = f"{branch_name}.pdf"
 
-        # PDFファイルのメタデータ設定
         file_metadata = {
             'name': file_name,
             'parents': [folder_id]
         }
 
-        # PDFファイルのアップロード
-        pdf_path = 'build/main.pdf'
-        if not os.path.exists(pdf_path):
-            raise FileNotFoundError(f"PDF file not found: {pdf_path}")
-
-        media = MediaFileUpload(pdf_path, mimetype='application/pdf')
+        media = MediaFileUpload('build/main.pdf', mimetype='application/pdf')
         file = drive_service.files().create(body=file_metadata, media_body=media, fields='id, webViewLink').execute()
 
-        # Google Driveのファイルリンクを取得
         file_link = file.get('webViewLink')
 
-        # Discordへのメッセージ送信
         discord_webhook_url = os.environ['DISCORD_WEBHOOK_URL']
         message = {
             "content": f"新しいPDFファイルがアップロードされました: {file_link}"
         }
 
-        # Discordにメッセージを送信
         response = requests.post(discord_webhook_url, json=message)
 
         if response.status_code == 204:
