@@ -32,6 +32,16 @@ jobs:
     - name: Refresh font cache
       run: |
         sudo fc-cache -fv
+<<<<<<< HEAD
+=======
+        luaotfload-tool --cache=erase
+        luaotfload-tool --update
+
+    - name: Set environment variables
+      run: |
+        export LANG=en_US.UTF-8
+        export LC_CTYPE=en_US.UTF-8
+>>>>>>> main
 
     - name: Clear luaotfload cache
       run: |
@@ -45,6 +55,11 @@ jobs:
 
     - name: Build LaTeX document
       run: |
+<<<<<<< HEAD
+=======
+        export LANG=en_US.UTF-8
+        export LC_CTYPE=en_US.UTF-8
+>>>>>>> main
         chmod +x build.sh
         ./build.sh
     
