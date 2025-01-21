@@ -99,7 +99,7 @@ Rasberrypiを用いたカメラ型デバイスを開発し、画像と音の相�
 これらの機能を実現するために、図\ref{fig:image-to-select-music}、図\ref{fig:music-play}の技術構成で実装した。
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.8\textwidth]{pages/report/images/image-to-select-music.png}
+  \includegraphics[width=0.8\textwidth]{pages/report/images/opeai-api.png}
   \caption{選曲機能の技術構成}
   \label{fig:image-to-select-music}
 \end{figure}
@@ -108,6 +108,31 @@ Rasberrypiを用いたカメラ型デバイスを開発し、画像と音の相�
   \includegraphics[width=0.8\textwidth]{pages/report/images/music-play.png}
   \caption{曲再生の技術構成}
   \label{fig:music-play}
+\end{figure}
+PythonとAPIの間にCloudflare WorkersでデプロイをしているHonoで作成した自作APIを挟んだ。
+その理由として、PythonでAPIを使用する場合に実装に誤りがあり大量のリクエストを送信してしまうと、APIの利用制限やクレジットの大量消費がおきてしまう可能性がある。
+そのため、自作のAPIを挟むことで、短時間にリクエストが来た場合にはAPIの利用を制限し、利用制限やクレジットの大量消費を防ぐことができた。
+\writer{金子康一}
+
+\subsection{環境音をビジュアルアートに変換する}
+環境音をビジュアルアートに変換するために、以下の二つの処理を行う。
+\begin{enumerate}
+  \item Pythonで環境音の解析を行う
+  \item 解析結果から画像生成のためのプロンプトを生成する
+  \item 画像を生成する
+\end{enumerate}
+これらの機能を実現するために、図\ref{fig:generate-prompt}、図\ref{fig:generate-image}の技術構成で実装した。
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{pages/report/images/opeai-api.png}
+  \caption{プロンプト生成の技術構成}
+  \label{fig:generate-prompt}
+\end{figure}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{pages/report/images/generate-image.png}
+  \caption{画像生成の技術構成}
+  \label{fig:generate-image}
 \end{figure}
 PythonとAPIの間にCloudflare WorkersでデプロイをしているHonoで作成した自作APIを挟んだ。
 その理由として、PythonでAPIを使用する場合に実装に誤りがあり大量のリクエストを送信してしまうと、APIの利用制限やクレジットの大量消費がおきてしまう可能性がある。
