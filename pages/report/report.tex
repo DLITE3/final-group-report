@@ -46,7 +46,76 @@
 
 \chapter{関連研究}
 \section{必要なスキル}
-\subsection{本プロジェクト学習で必要なスキル・技術}
+昨年度プロジェクト学習で使用されたスキル、技術は以下のようになっています。
+\begin{itemize}
+  \item M5Stack Core2
+  \item unitv2 AIカメラ
+  \item シリアル通信
+  \item RetinaFace
+  \item Object Recongnition
+  \item V-Training
+  \item UiFlow
+  \item RaspberryPi 4
+  \item OpenCV
+  \item M5Stack 用 ToF 距離センサユニット
+  \item M5Stack 用振動モータユニット
+  \item M5Stack 用超音波測距ユニット
+  \item 骨伝導イヤホン
+\end{itemize}
+\writer{金子康一}
+
+\section{解決方法・手法}
+目覚まし時計を止めるための方法として、ワイヤレスで目覚まし時計を操作する方法を考案する。
+目覚まし時計が作動しし目が覚めた後、スマホを操作することで目覚まし時計の停止ボタンが遠隔で押されるようにする。
+目覚まし時計本体の改造を行わなくても良いように、外付けが可能なデバイスを作成する。
+\writer{未来太郎}
+
+\chapter{本プロジェクト学習の目標}
+\section{最終的な目標}
+Rasberrypiを用いたカメラ型デバイスを開発し、画像と音の相互変換を行うことで、障害の有無に関わらず自然を楽しめるようにする。
+具体的には、撮影した写真にあった曲を再生する機能と、録音した環境音にあったビジュアルアートを生成する。
+それにより、自然の楽しみに新たな価値を生み出す。 
+\writer{金子康一}
+
+\chapter{目的を達成するための手法・手段}
+\section{考案したアイデア}
+\subsection{風景を音楽に変換する}
+風景の写真をもとにAIが写真に合った曲を選曲し、Spotifyで曲を再生する。
+このように風景を音楽に変換することで、視覚障害者でも音で風景を楽しむことを実現する。
+\writer{金子康一}
+
+\subsection{環境音をビジュアルアートに変換する}
+録音した環境音をもとにAIがビジュアルアートを生成する。
+このように環境音をビジュアルアートに変換することで、聴覚障害者でもビジュアルアートで環境音を楽しむことを実現する。
+\writer{金子康一}
+
+\section{新しい解決方法・手法}
+\subsection{風景を音楽に変換する}
+風景を音楽に変換するために、以下の二つの処理を行う。
+\begin{enumerate}
+  \item 画像に合った選曲を行う
+  \item Spotifyに曲が存在するかを調べ再生する
+\end{enumerate}
+これらの機能を実現するために、図\ref{fig:image-to-select-music}、図\ref{fig:music-play}の技術構成で実装した。
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{pages/report/images/image-to-select-music.png}
+  \caption{選曲機能の技術構成}
+  \label{fig:image-to-select-music}
+\end{figure}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{pages/report/images/music-play.png}
+  \caption{曲再生の技術構成}
+  \label{fig:music-play}
+\end{figure}
+PythonとAPIの間にCloudflare WorkersでデプロイをしているHonoで作成した自作APIを挟んだ。
+その理由として、PythonでAPIを使用する場合に実装に誤りがあり大量のリクエストを送信してしまうと、APIの利用制限やクレジットの大量消費がおきてしまう可能性がある。
+そのため、自作のAPIを挟むことで、短時間にリクエストが来た場合にはAPIの利用を制限し、利用制限やクレジットの大量消費を防ぐことができた。
+\writer{金子康一}
+
+\section{用いる技術}
+これらの機能を実現するために、以下の技術、スキルを用いた。
 \begin{itemize}
   \item プログラム言語・フレームワーク
   \begin{itemize}
@@ -73,32 +142,18 @@
     \item SPI
     \item カメラ
   \end{itemize}
+  \item 電子回路制作
+  \begin{itemize}
+    \item 電子回路設計
+    \item はんだ付け
+    \item 圧着
+  \end{itemize}
+  \item 本体制作
+  \begin{itemize}
+    \item Fusion360
+    \item CO2レーザーカッター
+  \end{itemize}
 \end{itemize}
-\writer{金子康一}
-
-\section{解決方法・手法}
-目覚まし時計を止めるための方法として、ワイヤレスで目覚まし時計を操作する方法を考案する。
-目覚まし時計が作動しし目が覚めた後、スマホを操作することで目覚まし時計の停止ボタンが遠隔で押されるようにする。
-目覚まし時計本体の改造を行わなくても良いように、外付けが可能なデバイスを作成する。
-\writer{未来太郎}
-
-\chapter{本プロジェクト学習の目標}
-\section{最終的な目標}
-本プロジェクト学習では、目覚まし時計をスマホで操作し遠隔で停止させるアプリ、デバイスを開発することで、快適な二度寝を実現することを目標とする。
-またそれにより、生活の質が向上し、幸福度を増加させることを最終的な目標とする。
-\writer{金子康一}
-
-\chapter{目的を達成するための手法・手段}
-\section{考案したアイデア}
-考案したアイデアについて述べる。
-\writer{金子康一}
-
-\section{新しい解決方法・手法}
-解決方法の新規性について述べたりする。
-\writer{金子康一}
-
-\section{用いる技術}
-上記を実現するために用いる技術について述べる。
 \writer{金子康一}
 
 \chapter{結果}
