@@ -12,25 +12,56 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Install minimal LaTeX packages
+    - name: Install required LaTeX packages
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          texlive-base texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
-          texlive-lang-cjk fonts-noto-cjk mendexk latexmk \
-          biber  # 必要なツールとパッケージ
+          texlive-base texlive-latex-base texlive-latex-extra \
+          texlive-fonts-recommended texlive-lang-cjk \
+          fonts-lmodern fonts-noto-cjk \
+          texlive-luatex latexmk biber mendexk
+
+    - name: Check for luaotfload-tool
+      run: |
+        if ! command -v luaotfload-tool; then
+          echo "luaotfload-tool not found, installing manually."
+          sudo tlmgr init-usertree
+          sudo tlmgr install luaotfload
+        fi
+
+    - name: Refresh font cache
+      run: |
+        sudo fc-cache -fv
+        luaotfload-tool --cache=erase
+        luaotfload-tool --update
+
+    - name: Set environment variables
+      run: |
+        export LANG=en_US.UTF-8
+        export LC_CTYPE=en_US.UTF-8
+
+    - name: Clear luaotfload cache
+      run: |
+        luaotfload-tool --cache=erase
 
     - name: Confirm pdfTeX version
-      run: latex --version  # pdfTeXバージョンの確認
+      run: latex --version
 
     - name: Make build script executable
       run: chmod +x build.sh
 
     - name: Build LaTeX document
-      run: ./build.sh
-
+      run: |
+        export LANG=en_US.UTF-8
+        chmod +x build.sh
+        ./build.sh
+    
     - name: Debug build folder
       run: ls -al build
+    
+    - name: Output LaTeX log on failure
+      if: failure()
+      run: cat build/main.log || true
 
     - name: Set up Python environment
       uses: actions/setup-python@v4
@@ -44,15 +75,12 @@ jobs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: "${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}"
         DISCORD_WEBHOOK_URL: "${{ secrets.DISCORD_WEBHOOK_URL }}"
-        BRANCH_NAME: "${{ github.ref }}"  # ブランチ名を取得
+        BRANCH_NAME: "${{ github.ref }}"
       run: |
-        # ブランチ名の抽出（refs/heads/ を取り除く）
         branch_name=$(echo $BRANCH_NAME | sed 's/refs\/heads\///')
 
-        # BRANCH_NAMEを環境変数として渡す
         export BRANCH_NAME=$branch_name
 
-        # PythonスクリプトでGoogle DriveにアップロードとDiscordへの送信
         python <<EOF
         import os
         import json
@@ -61,10 +89,7 @@ jobs:
         from googleapiclient.http import MediaFileUpload
         import requests
 
-        # シークレットから認証情報をJSON形式で取得
         credentials_info = json.loads(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
-
-        # Google Drive API認証
         creds = service_account.Credentials.from_service_account_info(
             credentials_info,
             scopes=['https://www.googleapis.com/auth/drive.file']
@@ -72,33 +97,26 @@ jobs:
 
         drive_service = build('drive', 'v3', credentials=creds)
 
-        # アップロードするGoogle DriveのフォルダID
         folder_id = "1sze5HxFJMdntN8H9GUrdXhiQbhFeUA22"
 
-        # BRANCH_NAME環境変数を使ってファイル名を決定
         branch_name = os.environ['BRANCH_NAME']
-        file_name = f"{branch_name}.pdf"  # ファイル名にブランチ名を追加
+        file_name = f"{branch_name}.pdf"
 
-        # PDFファイルのメタデータ設定
         file_metadata = {
-            'name': file_name,  # ブランチ名を含むファイル名
-            'parents': [folder_id]  # 指定したフォルダにアップロード
+            'name': file_name,
+            'parents': [folder_id]
         }
 
-        # PDFファイルのアップロード
         media = MediaFileUpload('build/main.pdf', mimetype='application/pdf')
         file = drive_service.files().create(body=file_metadata, media_body=media, fields='id, webViewLink').execute()
 
-        # Google Driveのファイルリンクを取得
         file_link = file.get('webViewLink')
 
-        # Discordへのメッセージ送信
         discord_webhook_url = os.environ['DISCORD_WEBHOOK_URL']
         message = {
             "content": f"新しいPDFファイルがアップロードされました: {file_link}"
         }
 
-        # Discordにメッセージを送信
         response = requests.post(discord_webhook_url, json=message)
 
         if response.status_code == 204:
